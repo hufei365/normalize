@@ -1,0 +1,18 @@
+{
+  "name": "myschema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "watch": "rollup -c ./rollup.config.js --watch",
+    "test": "npx jest --runInBand"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.4.7",
+    "rollup": "^2.66.0"
+  }
+}
