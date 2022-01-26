@@ -6,9 +6,10 @@ test('adds 1 + 2 to equal 3', () => {
 
 const { normalize, schema, denormalize} = require("../dist/myschema.js");
 
+const { Entity } = schema;
 
 
-// test cases from Jinyang.Li
+// test cases
 const dataSet = {
     nestedOriginalData: {
         testId: '999',
@@ -17,7 +18,7 @@ const dataSet = {
             desc: 'bar',
             users: [{
                 id: '3',
-                name: 'JinyangLi'
+                name: 'HuFei'
             }]
         }
     },
@@ -35,7 +36,7 @@ const dataSet = {
                 }
             },
             users: {
-                3: { id: '3', name: 'JinyangLi' }
+                3: { id: '3', name: 'HuFei' }
             }
         }
     },
@@ -77,7 +78,7 @@ const dataSet = {
         id: '321',
         author: {
             id: '3',
-            name: 'JinyangLi'
+            name: 'HuFei'
         },
         title: 'Jest',
         comments: [
@@ -85,7 +86,7 @@ const dataSet = {
                 id: '325',
                 commenter: {
                     id: '3',
-                    name: 'JinyangLi'
+                    name: 'HuFei'
                 }
             },
             {
@@ -155,7 +156,7 @@ const dataSet = {
             },
             users: {
                 2: { id: '2', name: 'Nicole' },
-                3: { id: '3', name: 'JinyangLi' }
+                3: { id: '3', name: 'HuFei' }
             },
             comments: {
                 325: { id: '325', commenter: '3' },

@@ -1,6 +1,6 @@
-import { Entity } from "./schema/entity";
-import * as arraySchema from './schema/arraySchema';
-import * as objectSchema from './schema/objectSchema';
+import { Entity } from "./schema/Entity";
+import * as ArraySchema from './schema/ArraySchema';
+import * as ObjectSchema from './schema/ObjectSchema';
 import { emptyObject } from "./util"
 
 export const schema = {
@@ -15,30 +15,33 @@ const walk = (data, entity, topEntities) => {
         const isArray = Array.isArray(data);
         const schema = isArray ? entity[0] : entity;
 
-        const result = isArray
-        ? data.map((item) => {
-            return item[schema.key];
-        })
-        : data[schema.key];
+        let result;
 
         const entityName = schema.name;
 
-        if (!topEntities[entityName]) {
+        if (entityName && !topEntities[entityName]) {
             topEntities[entityName] = emptyObject();
         }
 
-        if(isArray){
-            arraySchema.normalize(data, schema, topEntities, walk);
+        if (isArray) {
+            result = data.map((item) => item[schema.key]);
+            ArraySchema.normalize(data, schema, topEntities, walk);
         } else {
-            objectSchema.normalize(data, schema, topEntities, walk);
+            if (!(schema instanceof Entity)) {
+                result = ObjectSchema.normalize(data, schema, topEntities, walk);
+            } else {
+                result = data[schema.key];
+                schema.normalize(data, topEntities, walk);
+            }
         }
-        
+
         return result;
+    } else {
+        console.warn('[data] and [entity] 类型不一致')
     }
 };
 
 export const normalize = (data, entity) => {
-
     const entities = emptyObject();
 
     const result = walk(data, entity, entities, entities);
@@ -48,12 +51,6 @@ export const normalize = (data, entity) => {
         entities
     }
 };
-
-export const denormalize = (normalizedData, entity, entities) => {
-    
-};
-
-
 
 const verify = (data, entity) => {
     const dataIsArray = Array.isArray(data);
@@ -69,7 +66,35 @@ const verify = (data, entity) => {
     return true;
 }
 
-// 1. 传入一个实体，判断实体类型（Object ? Array ?)
-// 2. 根据实体遍历数据，获取对应实体列表
-// 3. 遍历过程中，修改原始数据，将对应的实体数据替换为key
-// 4. 如何避免对原数据的修改
+
+export const denormalize = (normalizedData, entity, entities) => {
+    if (!normalizedData) {
+        return normalizedData;
+    }
+    return deWalk(normalizedData, entity, entities);
+
+
+};
+
+const deWalk = (normalizedData, entity, entities) => {
+    if (verify(normalizedData, entity)) {
+
+        const isArray = Array.isArray(normalizedData);
+        const schema = isArray ? entity[0] : entity;
+
+
+        if (isArray) {
+            return ArraySchema.denormalize(normalizedData, schema, entities, deWalk);
+        } else {
+            if (!(entity instanceof Entity)) {
+                return ObjectSchema.denormalize(normalizedData, schema, entities, deWalk);
+            } else {
+                const newData = { ...entities[schema.name][normalizedData] };
+                schema.denormalize(newData, entities, deWalk);
+                return newData;
+            }
+        }
+    } else {
+        console.warn('[normalizedData] and [entity] 类型不一致')
+    }
+};

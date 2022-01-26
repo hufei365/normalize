@@ -18,14 +18,27 @@ export class Entity {
 
         // 嵌套实体的处理
         const entityParams = this.entityParams || {};
+
         Object.keys(entityParams).forEach((key) => {
             const subEntity = entityParams[key];
             if (cloneData[key]) {
                 cloneData[key] = walk(cloneData[key], subEntity, topEntities);
             }
         });
-        
+
         // 当前实体
         schemaEntity[data[this.key]] = cloneData;
+    }
+
+
+    denormalize(data, topEntities, deWalk) {
+        // 嵌套实体的处理
+        const entityParams = this.entityParams || {};
+        Object.keys(entityParams).forEach((key) => {
+            const subEntity = entityParams[key];
+            if (data[key]) {
+                data[key] = deWalk(data[key], subEntity, topEntities);
+            }
+        });
     }
 }
